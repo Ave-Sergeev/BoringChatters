@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
+          charset="UTF-8">
+    <title>Chat Web-Application S.A.A.</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body style="background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <noscript>
+        <h2>Извините, ваш браузер не поддерживает JavaScript.</h2>
+    </noscript>
+
+    <div id="username-page">
+        <div class="username-page-container">
+            <h1 class="title">Введите ваше имя:</h1>
+            <form id="usernameForm" name="usernameForm">
+                <div class="form-group">
+                    <input type="text" id="name" placeholder="Имя"
+                           autocomplete="off" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="accent username-submit">Начать общение</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="chat-page" class="hidden">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Boring Chatter | Cкучное общение</h2>
+            </div>
+            <div class="connecting">Соединение...</div>
+
+            <div style="height: calc(100% - 150px); width: calc(100% - 150px); display:inline-block;">
+                <ul id="messageArea">
+
+                </ul>
+            </div>
+
+            <div style="height: calc(100% - 150px); max-width:180px; display:inline-block; float:right;">
+                <ul id="usersListArea" style="float:right; text-align:center; max-width:140px; padding: 0;">
+
+                </ul>
+            </div>
+
+            <form id="messageForm" name="messageForm" nameForm="messageForm">
+                <div class="form-group">
+                    <div class="input-group clearfix">
+                        <input type="text" id="message" placeholder="Введите сообщение..."
+                               autocomplete="off" class="form-control" />
+                        <button type="submit" class="primary">Отправить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/script.js"></script>
+</body>
+</html>
