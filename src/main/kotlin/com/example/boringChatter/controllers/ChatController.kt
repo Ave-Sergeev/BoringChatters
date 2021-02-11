@@ -14,19 +14,21 @@ import java.util.ArrayList
 
 @Controller
 class ChatController(val messageRepository: MessageRepository,
-                     var userRepository: UserRepository?,
-                     val messagingTemplate: SimpMessagingTemplate) {
+                        var userRepository: UserRepository?,
+                        val messagingTemplate: SimpMessagingTemplate) {
 
-    //Возвращаем список юзеров только тому клиенту, который сделал запрос
+    //Возвращаем список юзеров тому клиенту, который сделал запрос
     @MessageMapping("/users.list.req/{sessionId}")
     @SendTo("/topic/{sessionId}/userList")
     fun sendUsers(): List<String> {
         userRepository = UserRepository.instance
         val namesList: MutableList<String> = ArrayList()
         val usersList: ArrayList<User> = userRepository!!.allUsers
+
         usersList.forEach { user ->
             namesList.add(user.name)
         }
+
         return namesList
     }
 
@@ -57,6 +59,7 @@ class ChatController(val messageRepository: MessageRepository,
         message.author = userRepository!!.getUserBySessionId(sessionId!!)!!.name
         message.sessionId = headerAccessor.sessionId
         messageRepository.save(message)
+
         return message
     }
 }

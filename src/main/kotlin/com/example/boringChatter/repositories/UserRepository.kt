@@ -13,7 +13,7 @@ import java.util.HashMap
 class UserRepository {
     private val users: MutableMap<String, User>
 
-    //Все методы synchronized, т.к. используют общий ресурс users: MutableMap<String, User>
+    //Методы synchronized, так как используют общий ресурс users: MutableMap<String, User>
     @get:Synchronized
     val allUsers: ArrayList<User>
         get() = ArrayList<User>(users.values)

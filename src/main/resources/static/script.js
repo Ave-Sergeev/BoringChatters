@@ -1,13 +1,13 @@
 'use strict';
 
-var usernamePage = document.querySelector('#username-page');
-var chatPage = document.querySelector('#chat-page');
-var usernameForm = document.querySelector('#usernameForm');
-var messageForm = document.querySelector('#messageForm');
-var messageInput = document.querySelector('#message');
-var messageArea = document.querySelector('#messageArea');
 var connectingElement = document.querySelector('.connecting');
 var usersListArea = document.querySelector('#usersListArea');
+var usernamePage = document.querySelector('#username-page');
+var usernameForm = document.querySelector('#usernameForm');
+var messageInput = document.querySelector('#message');
+var messageForm = document.querySelector('#messageForm');
+var messageArea = document.querySelector('#messageArea');
+var chatPage = document.querySelector('#chat-page');
 
 var mySessionId = null;
 var stompClient = null;
@@ -20,15 +20,17 @@ var colors = [
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
 ];
 
-//Нажатие кнопки - "Присоединится к общению"
+//Нажатие кнопки - "Присоединиться к общению"
 function connect(event) {
     username = document.querySelector('#name').value.trim();
 
     if(username) {
-        usernamePage.classList.add('hidden'); //скрытие формы ввода ника
+        //Скрываем форму ввода имени пользователя
+        usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
 
-        socket = new SockJS('/chat.connect'); //установка endpoint
+        //Устанавливаем endpoint
+        socket = new SockJS('/chat.connect');
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, onConnected, onError);
@@ -36,27 +38,29 @@ function connect(event) {
     event.preventDefault();
 }
 
-//Если успешно подключились к WebSocket
+//Успешное подключение к WebSocket
 function onConnected() {
     let urlArray = socket._transport.url.split('/');
-    mySessionId = urlArray[urlArray.length-2]; //вычисление номера сессии
+    //Вычисляем сессию(номер)
+    mySessionId = urlArray[urlArray.length-2];
 
     stompClient.subscribe('/topic/public', onMessageReceived);
     stompClient.subscribe('/topic/' + mySessionId + '/userList', onUserListReceived);
     stompClient.subscribe('/topic/lastMessages/' + mySessionId, lastMessagesReceived);
 
-    stompClient.send("/app/users.list.req/" + mySessionId, {}, {},); // запрос списка пользователей
+    //Запрос листа пользователей
+    stompClient.send("/app/users.list.req/" + mySessionId, {}, {},);
 
     connectingElement.classList.add('hidden');
 }
 
-//Если фейл подключения к WebSocket
+//Сбой подключения к WebSocket
 function onError(error) {
-    connectingElement.textText = 'Не удалось присоединится к WebSocket сессии, пожалуйста обновите страницу';
+    connectingElement.textText = 'Не удалось присоединиться к WebSocket сессии, пожалуйста обновите страницу';
     connectingElement.style.color = 'red';
 }
 
-//Отправка сообщений(всем)
+//Отправка широковещательных сообщений
 function send(event) {
     var messageText = messageInput.value.trim();
 
@@ -73,14 +77,14 @@ function send(event) {
     event.preventDefault();
 }
 
-//Вызываем при получении сообщения на '/topic/public'
+//Получение сообщения на '/topic/public'
 function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
 
     addMessageToArea(message, false);
 }
 
-//Отображаем сообщения в textArea, принимаем само сообщения и флаг, смотрим в архиве ли сообщение
+//Отображение сообщения в textArea, принимаем флаг и сообщение, смотрим в архиве ли сообщение
 function addMessageToArea(message, isArchive) {
     var messageElement = document.createElement('li');
 
@@ -124,27 +128,28 @@ function addMessageToArea(message, isArchive) {
         messageArea.scrollTop = messageArea.scrollHeight;
 }
 
-//Вызываем при получении списка пользователей
+//Вызов при получении списка пользователей
 function onUserListReceived(payload) {
     var message = JSON.parse(payload.body);
     for(let mess in message) {
         let userName = message[mess];
         addUserToUserList(userName);
     }
+    //Регистрация в чате, отправка имени пользователя, сервер соотносит его с сессией
     stompClient.send("/app/chat.register",
                         {},
                         JSON.stringify({author: username, type: 'JOIN'})
-    ); //регистрация в чате, отправка ника, который сервер будет соотносить с сессией
+    );
 }
 
-//Добавляем юзера в список пользователей
+//Добавление юзера в список пользователей
 function addUserToUserList(username) {
     var usersListElement = document.createElement('li');
     usersListElement.appendChild(document.createTextNode(username));
     usersListArea.appendChild(usersListElement);
 }
 
-//Удаляем юзера из списка пользователей
+//Удаление юзера из списка пользователей
 function removeUserFromUserList(username) {
     let listLength = usersListArea.children.length;
 
@@ -157,7 +162,7 @@ function removeUserFromUserList(username) {
     }
 }
 
-//Вызываем при получении массива архивных сообщений
+//Вызов при получении массива архивных сообщений
 function lastMessagesReceived(payload) {
     let message = JSON.parse(payload.body);
     let listLength = message.length;
@@ -166,7 +171,7 @@ function lastMessagesReceived(payload) {
     }
 }
 
-//Метод, формирующий цвет фона аватара
+//Формирование цвет фона авы, по хешу
 function getAvatarColor(messageSender) {
     var hash = 0;
     for (var i = 0; i < messageSender.length; i++) {
